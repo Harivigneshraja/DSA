@@ -1,0 +1,31 @@
+import java.util.*;
+public class Main{
+    public static void main(String[]args)
+    {
+        Scanner sc=new Scanner(System.in);
+        int n=sc.nextInt();
+        int a[]=new int[n];
+        for(int i=0;i<n;i++)
+        {
+            a[i]=sc.nextInt();
+        }
+        int edge=sc.nextInt();
+        int e[]=new int[edge*2];
+        for(int i=0;i<edge*2;i++)
+        {
+            e[i]=sc.nextInt();
+        }
+        int sender=sc.nextInt();
+        int receiver=sc.nextInt();
+        int ans=0;
+        for(int i=0;i<edge*2-1;i++)
+        {
+            if(e[i+1]==sender&&e[i]==receiver)
+            {
+            ans=1;
+            break;
+            }
+        }
+        System.out.println(ans);
+    }
+}
