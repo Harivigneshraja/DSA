@@ -1,0 +1,41 @@
+import java.util.*;
+
+public class GraphPath {
+    
+    public static boolean isPathExist(Map<Integer, List<Integer>> graph, int source, int target, Set<Integer> visited) {
+        visited.add(source);
+        if (source == target) return true;
+        for (int child : graph.getOrDefault(source, new ArrayList<>())) {
+            if (!visited.contains(child)) {
+                boolean ans = isPathExist(graph, child, target, visited);
+                if (ans) return true;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        
+        int noNodes = sc.nextInt();
+        List<Integer> nodes = new ArrayList<>(noNodes);
+        for (int i = 0; i < noNodes; i++) {
+            nodes.add(sc.nextInt());
+        }
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+        Set<Integer> visited = new HashSet<>();
+        int edges = sc.nextInt();
+        for (int i = 0; i < edges; i++) {
+            int x = sc.nextInt();
+            int y = sc.nextInt();
+            graph.computeIfAbsent(x, k -> new ArrayList<>()).add(y);
+            graph.computeIfAbsent(y, k -> new ArrayList<>()).add(x);
+        }
+        int sender = sc.nextInt();
+        int receiver = sc.nextInt();
+        boolean ans = isPathExist(graph, sender, receiver, visited);
+        if (ans) System.out.println("1");
+        else System.out.println("0");
+        sc.close();
+    }
+}
