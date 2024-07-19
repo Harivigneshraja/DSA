@@ -1,0 +1,106 @@
+import java.util.*;
+
+class Main {
+    static String lockNode(String nodeName, Map<String, String> nodeStatus) {
+        if ("lock".equals(nodeStatus.get(nodeName)) || "fail".equals(nodeStatus.get(nodeName))) {
+            return "false";
+        } else {
+            nodeStatus.put(nodeName, "lock");
+            return "true";
+        }
+    }
+
+    static String unlockNode(String nodeName, Map<String, String> nodeStatus) {
+        if ("lock".equals(nodeStatus.get(nodeName))) {
+            nodeStatus.put(nodeName, "unlock");
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
+    static String upgradeNode(String nodeName, Map<String, String> nodeStatus, List<String> nodeList) {
+        int index = nodeList.indexOf(nodeName) + 1;
+        int childIndex1 = index * 2;
+        int childIndex2 = index * 2 + 1;
+        if (childIndex1 < nodeList.size() && childIndex2 < nodeList.size()) {
+            if ("lock".equals(nodeStatus.get(nodeList.get(childIndex1 - 1))) && 
+                "lock".equals(nodeStatus.get(nodeList.get(childIndex2 - 1)))) {
+                nodeStatus.put(nodeList.get(childIndex1 - 1), "unlock");
+                nodeStatus.put(nodeList.get(childIndex2 - 1), "unlock");
+                nodeStatus.put(nodeName, "lock");
+                return "true";
+            } else {
+                return "false";
+            }
+        }
+        return "false";
+    }
+
+    static Map<String, String> precomputeNodeStatus(List<String> nodeList, List<String> queryList) {
+        List<String> nodeData = new ArrayList<>();
+        for (String query : queryList) {
+            String[] parts = query.split(" ");
+            nodeData.add(parts[1]);
+            nodeData.add(parts[0]);
+        }
+        Map<String, String> nodeStatus = new HashMap<>();
+        for (int j = 0; j < nodeData.size() - 1; j += 2) {
+            nodeStatus.put(nodeData.get(j), "unlock");
+        }
+        return nodeStatus;
+    }
+
+    static String performOperation(String nodeName, int operationCode, Map<String, String> nodeStatus, List<String> nodeList) {
+        String result = "false";
+        switch (operationCode) {
+            case 1:
+                result = lockNode(nodeName, nodeStatus);
+                break;
+            case 2:
+                result = unlockNode(nodeName, nodeStatus);
+                break;
+            case 3:
+                result = upgradeNode(nodeName, nodeStatus, nodeList);
+                break;
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int numberOfNodes = 7;
+        int numberOfQueries = 2;
+        int apiCalls = 5;
+
+        List<String> nodeList = new ArrayList<>();
+        nodeList.add("World");
+        nodeList.add("Asia");
+        nodeList.add("Africa");
+        nodeList.add("China");
+        nodeList.add("India");
+        nodeList.add("SouthAfrica");
+        nodeList.add("Egypt");
+
+        List<String> queryList = new ArrayList<>();
+        queryList.add("1 China 9");
+        queryList.add("1 India 9");
+        queryList.add("3 Asia 9");
+        queryList.add("2 India 9");
+        queryList.add("2 Asia 9");
+
+        Map<String, String> nodeStatus = precomputeNodeStatus(nodeList, queryList);
+        List<String> queryData = new ArrayList<>();
+        for (String query : queryList) {
+            String[] parts = query.split(" ");
+            queryData.add(parts[1]);
+            queryData.add(parts[0]);
+        }
+        for (int j = 0; j < queryData.size() - 1; j += 2) {
+            System.out.print(
+                performOperation(queryData.get(j),
+                                Integer.parseInt(queryData.get(j + 1)),
+                                nodeStatus, nodeList)
+                + " ");
+        }
+    }
+}
